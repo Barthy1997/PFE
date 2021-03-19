@@ -14,7 +14,7 @@
                 </div>
                 <div class="spinner-layer spinner-red">
                     <div class="circle-clipper left">
-                        <div class="circle"></div>
+                        <div class="circle"></div> 
                     </div>
                     <div class="gap-patch">
                         <div class="circle"></div>
@@ -464,8 +464,10 @@
                                                 </div>
                                             </div>
                                             <div class="card-block table-border-style">
-                                                <div class="table-responsive">
+                                                <div  class="table-responsive">
+                                                <div >
                                                     <table class="table">
+
                                                         <thead>
                                                             <tr>
                                                                 <th>#</th>
@@ -475,26 +477,17 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <th scope="row">1</th>
-                                                                <td>Mark</td>
-                                                                <td>Otto</td>
-                                                                <td>@mdo</td>
+                                                            <tr *ngFor='let item of listeUser;index as i'>
+                                                                <th scope="row">{{item.id}}</th>
+                                                                <td>{{item|slice:0:10}}</td>
+                                                                <td>{{item.mot|slice:0:10}}</td>
+                                                                <td>{{item.categorie|slice:0:10}}</td>
                                                             </tr>
-                                                            <tr>
-                                                                <th scope="row">2</th>
-                                                                <td>Jacob</td>
-                                                                <td>Thornton</td>
-                                                                <td>@fat</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th scope="row">3</th>
-                                                                <td>Larry</td>
-                                                                <td>the Bird</td>
-                                                                <td>@twitter</td>
-                                                            </tr>
+        
                                                         </tbody>
+
                                                     </table>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -517,40 +510,7 @@
                                                     </ul>
                                                 </div>
                                             </div>
-                                            <div class="card-block table-border-style">
-                                                <div class="table-responsive">
-                                                    <table class="table table-hover">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>#</th>
-                                                                <th>First Name</th>
-                                                                <th>Last Name</th>
-                                                                <th>Username</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <th scope="row">1</th>
-                                                                <td>Mark</td>
-                                                                <td>Otto</td>
-                                                                <td>@mdo</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th scope="row">2</th>
-                                                                <td>Jacob</td>
-                                                                <td>Thornton</td>
-                                                                <td>@fat</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th scope="row">3</th>
-                                                                <td>Larry</td>
-                                                                <td>the Bird</td>
-                                                                <td>@twitter</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
+                                            
                                         </div>
                                         <!-- Hover table card end -->
                                         <!-- Contextual classes table starts -->

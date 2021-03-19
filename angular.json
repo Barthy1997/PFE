@@ -124,5 +124,8 @@
       }
     }
   },
-  "defaultProject": "Eddokena"
+  "defaultProject": "Eddokena",
+  "cli": {
+    "analytics": "94eccf43-6c90-48af-a984-474ea047b28b"
+  }
 }

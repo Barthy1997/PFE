@@ -1,136 +1,97 @@
 const express = require('express');
 const AuthRoute = express.Router();
 const config = require('../ConfigureBd/db');
-const sql=require('mssql');
-const brypt=require('bcrypt');
-const session=require('express-session');
-const flash=require('express-flash');
-let envoi;
-AuthRoute.route('').get((req,res,next)=>{
-    sql.connect(config).then(()=>{
-        return sql.query('Select * From UserDepot');
-    }).then(result => {
-        res.json(result)
-    })
+const sql = require('mssql');
+const brypt = require('bcrypt');
+var jwt = require("jsonwebtoken");
+let jwt_secret = "hdhzfghzhgszghsbgshh5262626626JDHSG";
+let code;
+let token;
 
-  
-});
-AuthRoute.route('/getUser').get((req,res,next)=>{
-    sql.connect(config).then(()=>{
-        return sql.query('Select * From Client');
-    }).then(result => {
-        res.json({
-            result:result.recordset
-        })
-        //console.log(result.recordset[6].password)
-        
-        
-    })
 
-  
-});
-AuthRoute.route('/getUsr').get(async(req,res)=>{
-    try{
-        const hash= await brypt.hash('ozozo',10)
-        console.log(hash)
 
-    }catch{
-        console.log('PLus')
-
-    }
-
-});
-
-AuthRoute.route('/inscriptionCommercial').post(async(req,res)=>{
-    try{
-        sql.connect(config).then(()=>{
-            let salt=brypt.genSaltSync(10)
-            let hash=brypt.hashSync(req.body.password,salt)
-            return sql.query("INSERT INTO Commercial VALUES('"+req.body.nom+"','"+req.body.prenom+"','"+req.body.codecommercial+"','"+hash+"')");
-        }).then(result => {
-            res.json({
-                user:result
-            })
-        })
-    }catch(error)
-    {
+AuthRoute.route('/inscriptionCommercial').post(async (req, res) => {
+    try {
+        const reponse = await sql.connect(config);
+        let salt = brypt.genSaltSync(10)
+        let hash = brypt.hashSync(req.body.password, salt)
+        const commercial = await sql.query("INSERT INTO Commercial VALUES('" + req.body.nom + "','" + req.body.prenom + "','" + req.body.codecommercial + "','" + hash + "')");
+        res.json(commercial)
+    } catch (error) {
         console.log('PLus')
 
     }
 });
 
 
-AuthRoute.route('/deconnection').post((req,res,next)=>{
-    sql.connect(config).then(()=>{
-        let salt=brypt.genSaltSync(10)
-        let hash=brypt.hashSync(req.body.password,salt)
-        return sql.query("INSERT INTO Commercial VALUES('"+req.body.nom+"','"+req.body.prenom+"','"+req.body.codecommercial+"','"+hash+"')");
-    }).then(result => {
-        res.json({
-            user:result
-        })
+AuthRoute.route('/inscriptionClient').post(async (req, res) => {
+    try {
+        const reponse = await sql.connect(config);
+        let salt = brypt.genSaltSync(10)
+        let hash = brypt.hashSync(req.body.password, salt)
+        const client = await sql.query("INSERT INTO Client VALUES('" + req.body.nom + "','" + req.body.prenom + "','" + req.body.codecommercial + "','" + req.body.codeclient + "','" + req.body.categorie + "','" + hash + "')");
+        res.json(client)
+    } catch {
+        console.log('Erreur')
+
+    }
+
+});
+
+
+AuthRoute.route('/login').post(async (req, res) => {
+
+    try {
+        const reponse = await sql.connect(config);
+        const request = await sql.query("SELECT password From Client where nom='" + req.body.Username + "'");
+        for (var i = 0; i < request.rowsAffected; i++) {
+            code = brypt.compareSync(req.body.password, request.recordset[i].password);
+            if (code===true) {
+                code = true;
+            }
+            else {
+                code = false;
+            }
+        }
+        if (code===true) {
+            const user = req.body.Username;
+            token = await jwt.sign({
+                user
+            }, jwt_secret, {
+                expiresIn: '2h'
+            });
+            res.json(token);
+            console.log('Envoi token')
+        }
+        else {
+            res.json(err)
+            console.log('Erreurs', code)
+        }
+
+    } catch (error) {
+        console.log('Erreur')
+
+    }
+})
+
+
+AuthRoute.route('/authorisation').post(async (req, res) => {
+    const header = res.header('x-token', token)
+    console.log('bonjour',req.headers['authorization']);
+    console.log(res.header('x-token'))
+    jwt.verify(header, token, (err, token) => {
+        if (err) {
+            res.sendStatus(403)
+            console.log('erreur authentification')
+        }
+        else {
+            res.json(token)
+            console.log('succès')
+        }
     })
 
-});
 
-AuthRoute.route('/inscriptionClient').post(async(req,res)=>{
-    try{
-        sql.connect(config).then(()=>{
-            let salt=brypt.genSaltSync(10)
-            let hash=brypt.hashSync(req.body.password,salt)
-            return sql.query("INSERT INTO Client VALUES('"+req.body.nom+"','"+req.body.prenom+"','"+req.body.codecommercial+"','"+req.body.codeclient+"','"+req.body.categorie+"','"+hash+"')");
-        }).then(result => {
-            res.json(result)
-        })
-
-    }catch{
-        console.log('Erreur')
-
-    }
-    
-});
-AuthRoute.route('/login').post(async(req,res)=>{
-    try{
-        sql.connect(config).then(()=>{
-            sql.query("SELECT password From Client where nom='"+req.body.Username+"'").then(pwd=>{
-            var data=pwd.recordset[0].password
-            console.log(data)
-            var reponse=brypt.compareSync(req.body.password,data);   
-            return reponse;
-            }).then(resultat => {
-                res.json(resultat)
-                if(resultat==true)
-                {
-                   envoi=true;
-                   console.log(envoi)
-                }
-                else{
-                    envoi=false;
-                    console.log(envoi)
-
-                }
-                console.log(resultat)
-        });
-           });
-}catch(error)
-    {
-        console.log('Erreur')
-
-    }
 })
-
-AuthRoute.route('/login').get(async(req,res)=>{
-    try{
-        res.json(envoi)
-        console.log('envoie',envoi)
-
-}catch(error)
-    {
-        console.log('Erreur')
-
-    }
-})
-
-module.exports=AuthRoute;
+module.exports = AuthRoute;
 
 

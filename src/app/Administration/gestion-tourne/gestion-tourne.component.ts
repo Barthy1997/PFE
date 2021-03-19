@@ -14,8 +14,7 @@ export class GestionTourneComponent implements OnInit {
   ngOnInit(): void {
     this.authenService.getUser().subscribe(
       data=>{
-        this.listUser=data.user;
-        this.listUser=Array.of(this.listUser);
+        this.listUser=data;
         console.log(this.listUser)
       }
     )
